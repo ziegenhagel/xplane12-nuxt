@@ -65,83 +65,90 @@ const setFcuVs = async () => {
 
 <template>
   <div>
-    <h1>FCU</h1>
-    <div class="flex">
-      SPD
-      <input type="number" v-model="fcu_speed" @change="setFcuSpeed" style="width: 100px"/>
-
-      HDG
-      <input type="number" v-model="fcu_heading" @change="setFcuHeading" style="width: 100px"/>
-
-      ALT
-      <input type="number" v-model="fcu_altitude" @change="setFcuAltitude" style="width: 100px"/>
-
-      VS
-      <input type="number" v-model="fcu_vs" @change="setFcuVs" style="width: 100px"/>
+    <div class="fcu">
+      <div class="subpanel">
+        <div>
+          SPD
+          <input type="number" v-model="fcu_speed" @change="setFcuSpeed" style="width: 100px"/>
+        </div>
+        <div>
+          HDG
+          <input type="number" v-model="fcu_heading" @change="setFcuHeading" style="width: 100px"/>
+        </div>
+      </div>
+      <div class="subpanel">
+        <div>
+          ALT
+          <input type="number" v-model="fcu_altitude" @change="setFcuAltitude" style="width: 100px"/>
+        </div>
+        <div>
+          VS
+          <input type="number" v-model="fcu_vs" @change="setFcuVs" style="width: 100px"/>
+        </div>
+      </div>
     </div>
-
-    <hr/>
-    <h1>RMP</h1>
-    <table>
-      <tr>
-        <td>COM1</td>
-        <td></td>
-        <td>STDBY</td>
-      </tr>
-      <tr>
-        <td>
-          <code>{{ com1_freq_hz }}</code>
-        </td>
-        <td>
-          <button @click="switchCom1"><-></button>
-        </td>
-        <td>
-          <code>{{ com1_stdby_freq_hz }}</code>
-        </td>
-      </tr>
-
-      <tr>
-        <td><input type="number" @change="setCom1Freq"
-                   min="11800" max="13600" v-model="new_com1_freq_hz"/></td>
-        <td></td>
-        <td><input type="number" min="11800" max="13600" @change="setCom1StdbyFreq" v-model="new_com1_stdby_freq_hz"/>
-        </td>
-      </tr>
-
-    </table>
-    <hr/>
+    <div class="rmp">
+      <section>
+        <div>ACTIVE</div>
+        <input type="number" @change="setCom1Freq" min="11800" max="13600" v-model="new_com1_freq_hz"/>
+      </section>
+      <section>
+        <button class="bg-black text-green-600 text-2xl mb-2 px-3 rounded" style="padding-bottom: 2px"
+                @click="switchCom1"
+        >&hArr;
+        </button>
+      </section>
+      <section>
+        <div>STDBY</div>
+        <input type="number" @change="setCom1StdbyFreq" min="11800" max="13600" v-model="new_com1_stdby_freq_hz"/>
+      </section>
+    </div>
   </div>
 </template>
 <style>
+
 @font-face {
   font-family: "7seg";
   src: url("/fonts/7seg.ttf");
+}
+
+.fcu {
+  @apply flex gap-2 p-2
+}
+
+.subpanel {
+  @apply flex bg-black rounded-lg overflow-hidden px-2 border border-gray-500 border-2 border-b-gray-300
+}
+
+.rmp {
+  @apply flex gap-2 p-2 items-end text-white;
+
+  input {
+    @apply px-1 text-center
+  }
 }
 
 code, input {
   font-family: "7seg";
   font-size: 2em;
   color: orange;
-  width: 100%;
   box-sizing: border-box;
-  background: #222;
-  border: 2px solid #444;
-  padding: 0.2em 0.5em;
   display: block;
+  background: black;
 }
 
 body {
-  background: #333;
+  background: #6D87A1;
+  font-family: sans-serif;
 }
 
-.flex {
+.fcu {
   display: flex;
   align-items: center;
   gap: .5em;
-}
 
-.flex input {
-  margin-right: 1em;
-  flex: 1;
+  div {
+    color: orange;
+  }
 }
 </style>
