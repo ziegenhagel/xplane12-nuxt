@@ -61,6 +61,11 @@ const setFcuVs = async () => {
   await writeDataref('sim/cockpit/autopilot/vertical_velocity', fcu_vs.value)
 }
 
+// general
+const selectAllOnFocus = (event: FocusEvent) => {
+  const input = event.target as HTMLInputElement
+  input.select()
+}
 </script>
 
 <template>
@@ -69,28 +74,32 @@ const setFcuVs = async () => {
       <div class="subpanel">
         <div>
           SPD
-          <input type="number" v-model="fcu_speed" @change="setFcuSpeed" style="width: 100px"/>
+          <input type="number" @focus="selectAllOnFocus" v-model="fcu_speed" @change="setFcuSpeed"
+                 style="width: 100px"/>
         </div>
         <div>
           HDG
-          <input type="number" v-model="fcu_heading" @change="setFcuHeading" style="width: 100px"/>
+          <input type="number" @focus="selectAllOnFocus" v-model="fcu_heading" @change="setFcuHeading"
+                 style="width: 100px"/>
         </div>
       </div>
       <div class="subpanel">
         <div>
           ALT
-          <input type="number" v-model="fcu_altitude" @change="setFcuAltitude" style="width: 100px"/>
+          <input type="number" @focus="selectAllOnFocus" v-model="fcu_altitude" @change="setFcuAltitude"
+                 style="width: 100px"/>
         </div>
         <div>
           VS
-          <input type="number" v-model="fcu_vs" @change="setFcuVs" style="width: 100px"/>
+          <input type="number" @focus="selectAllOnFocus" v-model="fcu_vs" @change="setFcuVs" style="width: 100px"/>
         </div>
       </div>
     </div>
     <div class="rmp">
       <section>
         <div>ACTIVE</div>
-        <input type="number" @change="setCom1Freq" min="11800" max="13600" v-model="new_com1_freq_hz"/>
+        <input type="number" @focus="selectAllOnFocus" @change="setCom1Freq" min="11800" max="13600"
+               v-model="new_com1_freq_hz"/>
       </section>
       <section>
         <button class="bg-black text-green-600 text-2xl mb-2 px-3 rounded" style="padding-bottom: 2px"
@@ -100,7 +109,8 @@ const setFcuVs = async () => {
       </section>
       <section>
         <div>STDBY</div>
-        <input type="number" @change="setCom1StdbyFreq" min="11800" max="13600" v-model="new_com1_stdby_freq_hz"/>
+        <input type="number" @focus="selectAllOnFocus" @change="setCom1StdbyFreq" min="11800" max="13600"
+               v-model="new_com1_stdby_freq_hz"/>
       </section>
     </div>
   </div>
