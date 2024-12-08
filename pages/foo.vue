@@ -61,6 +61,15 @@ const setFcuVs = async () => {
   await writeDataref('sim/cockpit/autopilot/vertical_velocity', fcu_vs.value)
 }
 
+// TCAS
+const squawk = ref(0)
+const {data: data7} = await readDataref('sim/cockpit/radios/transponder_code')
+squawk.value = data7
+
+const setSquawk = async () => {
+  await writeDataref('sim/cockpit/radios/transponder_code', squawk.value)
+}
+
 // general
 const selectAllOnFocus = (event: FocusEvent) => {
   const input = event.target as HTMLInputElement
@@ -113,6 +122,13 @@ const selectAllOnFocus = (event: FocusEvent) => {
                v-model="new_com1_stdby_freq_hz"/>
       </section>
     </div>
+
+    <div class="tcas">
+      <section>
+        <div>SQUAWK</div>
+        <input type="number" @focus="selectAllOnFocus" @change="setSquawk" min="0" max="7777" v-model="squawk"/>
+      </section>
+    </div>
   </div>
 </template>
 <style>
@@ -134,7 +150,15 @@ const selectAllOnFocus = (event: FocusEvent) => {
   @apply flex gap-2 p-2 items-end text-white;
 
   input {
-    @apply px-1 text-center
+    @apply px-2 text-center
+  }
+}
+
+.tcas {
+  @apply text-white px-2;
+
+  input {
+    @apply text-white px-3
   }
 }
 
