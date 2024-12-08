@@ -32,12 +32,56 @@ const switchCom1 = async () => {
   await writeDataref('sim/cockpit/radios/com1_freq_hz', com1_freq_hz.value)
   await writeDataref('sim/cockpit/radios/com1_stdby_freq_hz', com1_stdby_freq_hz.value)
 }
+
+/// FCU
+const fcu_altitude = ref(0)
+const fcu_heading = ref(0)
+const fcu_speed = ref(0)
+const fcu_vs = ref(0)
+
+const {data: data3} = await readDataref('sim/cockpit/autopilot/altitude')
+fcu_altitude.value = data3
+const {data: data4} = await readDataref('sim/cockpit/autopilot/heading_mag')
+fcu_heading.value = data4
+const {data: data5} = await readDataref('sim/cockpit/autopilot/airspeed')
+fcu_speed.value = data5
+const {data: data6} = await readDataref('sim/cockpit/autopilot/vertical_velocity')
+fcu_vs.value = data6
+
+const setFcuAltitude = async () => {
+  await writeDataref('sim/cockpit/autopilot/altitude', fcu_altitude.value)
+}
+const setFcuHeading = async () => {
+  await writeDataref('sim/cockpit/autopilot/heading_mag', fcu_heading.value)
+}
+const setFcuSpeed = async () => {
+  await writeDataref('sim/cockpit/autopilot/airspeed', fcu_speed.value)
+}
+const setFcuVs = async () => {
+  await writeDataref('sim/cockpit/autopilot/vertical_velocity', fcu_vs.value)
+}
+
 </script>
 
 <template>
   <div>
-    <h1>X-Plane Datarefs</h1>
+    <h1>FCU</h1>
+    <div class="flex">
+      SPD
+      <input type="number" v-model="fcu_speed" @change="setFcuSpeed" style="width: 100px"/>
 
+      HDG
+      <input type="number" v-model="fcu_heading" @change="setFcuHeading" style="width: 100px"/>
+
+      ALT
+      <input type="number" v-model="fcu_altitude" @change="setFcuAltitude" style="width: 100px"/>
+
+      VS
+      <input type="number" v-model="fcu_vs" @change="setFcuVs" style="width: 100px"/>
+    </div>
+
+    <hr/>
+    <h1>RMP</h1>
     <table>
       <tr>
         <td>COM1</td>
@@ -65,9 +109,7 @@ const switchCom1 = async () => {
       </tr>
 
     </table>
-
     <hr/>
-
   </div>
 </template>
 <style>
@@ -90,5 +132,16 @@ code, input {
 
 body {
   background: #333;
+}
+
+.flex {
+  display: flex;
+  align-items: center;
+  gap: .5em;
+}
+
+.flex input {
+  margin-right: 1em;
+  flex: 1;
 }
 </style>
