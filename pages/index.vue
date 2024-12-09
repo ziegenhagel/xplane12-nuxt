@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Mcdu from "~/pages/mcdu.vue";
+
 const {readDataref, writeDataref, command} = useXPlane()
 
 const com1_freq_hz = ref(0)
@@ -135,9 +137,7 @@ const cmd = async (cmd: string) => {
     </div>
   </div>
 
-  <button @click="cmd('sim/autopilot/heading_down')">
-    Heading down
-  </button>
+  <mcdu />
 </template>
 <style>
 
