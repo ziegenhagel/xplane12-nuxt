@@ -1,22 +1,37 @@
 <template>
-  <div class="fms-display">
-    <div class="lsks">
-      <button v-for="(line, index) in [1, 2, 3, 4, 5, 6]" class="lsk" @click="lsk(line,'l')">-</button>
-    </div>
-    <div class="lines">
-      <div v-for="(line, index) in displayLines" :key="index" class="fms-line">
-        <template v-for="(char, charIndex) in line.chars" :key="charIndex">
+  <div class="flex items-center justify-center h-screen">
+    <div class="fms" style="width: 27em">
+      <div class="fms-top">
+
+        <div class="fms-display">
+          <div class="lsks">
+            <button v-for="(line, index) in [1, 2, 3, 4, 5, 6]" class="lsk" @click="lsk(line,'l')">-</button>
+          </div>
+          <div class="lines">
+            <div v-for="(line, index) in displayLines" :key="index" class="fms-line">
+              <template v-for="(char, charIndex) in line.chars" :key="charIndex">
         <span
             :style="getCharacterStyle(char.style)"
             :title="char.style"
             class="fms-char"
         >{{ char.text }}</span>
-        </template>
+              </template>
+            </div>
+          </div>
+          <div class="lsks">
+            <button v-for="(line, index) in [1, 2, 3, 4, 5, 6]" class="lsk" @click="lsk(line,'r')">-</button>
+          </div>
+        </div>
       </div>
+
+      <div class="fms-keys">
+        <div class="lg grid grid-cols-6">
+          <button v-for="(key,cmd) in FMS_KEYS.controlKeys" @click="fmsclick(cmd)">{{ key }}</button>
+        </div>
+      </div>
+
     </div>
-    <div class="lsks">
-      <button v-for="(line, index) in [1, 2, 3, 4, 5, 6]" class="lsk" @click="lsk(line,'r')">-</button>
-    </div>
+    <img width="400" src="/mcdu.jpeg" alt="MCDU"/>
   </div>
   <button @click="updateFmsData">Update</button>
 </template>
@@ -184,21 +199,133 @@ const lsk = async (line, side) => {
   await command(`sim/FMS/ls_${line}${side}`)
   await updateFmsData()
 }
+
+const FMS_KEYS = {
+  // Navigation-related keys
+  // navKeys: [
+  //   'index',
+  //   'foln',
+  //   'grz',
+  //   'des',
+  //   'dir intc',
+  //   'legs',
+  //   'delaarr',
+  //   'fix',
+  //   'navrad',
+  //   'airport'
+  // ],
+
+  // Control and execution keys
+  controlKeys: {
+    'dir_intc': 'DIR',
+    'prog': 'PROG',
+    'perf': 'PERF',
+    'index': 'INIT',
+    'data': 'DATA',
+    '_0': '',
+    'airport': 'F-PLN',
+    'navrad': 'NAV RAD',
+    'fuel_pred': 'FUEL',
+    'sec_fpln': 'SEC F-PLN',
+    '_3': 'ATC COMM',
+    '_1': 'MCDU MENU',
+  },
+  navigationKeys: {
+    'airport ': 'AIR PORT',
+    '_2': ''
+  },
+
+  // Performance and data keys
+  performanceKeys: [
+    'perf',
+    'fuel pred',
+    'data'
+  ],
+
+  // Numeric keys
+  numericKeys: [
+    'key_0',
+    'key_1',
+    'key_?',
+    'key_3',
+    'key_4',
+    'key_5',
+    'key_6',
+    'key_7',
+    'key_8',
+    'key_9'
+  ],
+
+  // Alphabetic keys
+  alphabeticKeys: [
+    'key_A',
+    'key_B',
+    'key_C',
+    'key_D',
+    'key_E',
+    'key_F',
+    'key_G',
+    'key_H',
+    'key_I',
+    'key_J',
+    'key_K',
+    'key_L',
+    'key_M',
+    'key_N',
+    'key_o',
+    'key_P',
+    'Key_Q',
+    'key_R',
+    'key_S',
+    'key_T',
+    'key_u',
+    'key_V',
+    'key_W',
+    'key_X',
+    'key_Y',
+    'key_Z'
+  ],
+
+  // Special characters and control keys
+  specialKeys: [
+    'key_period',
+    'key_minus',
+    'key_slash',
+    'key_back',
+    'key_space',
+    'key_delete',
+    'key_clear',
+    'key_overfly'
+  ]
+};
+
+
+const fmsclick = async (key) => {
+  await command(`sim/FMS/${key}`)
+  await updateFmsData()
+}
 </script>
 
 <style scoped>
 .fms-display {
-  background-color: #000;
-  padding: 1rem;
+  padding: 2.9rem .4rem 0;
   font-family: monospace;
-  line-height: 1.2;
   font-size: 1.5em;
-  @apply flex gap-4
+  @apply flex gap-4;
+
+  .lines {
+    @apply bg-black border border-gray-500 border-2 border-b-gray-300 rounded-lg p-2;
+  }
+}
+
+.fms-top {
+  background: url('/fms-top.png') no-repeat top center;
+  background-size: 100%;
 }
 
 .fms-line {
   white-space: pre;
-  height: 1.2em;
+  line-height: 1.02;
 }
 
 .fms-char {
@@ -210,11 +337,29 @@ const lsk = async (line, side) => {
 .lsks {
   @apply flex flex-col;
   margin-top: 2.35em;
-  gap: 1.18em;
+  gap: .8em;
 
   .lsk {
     @apply px-4 h-6 flex items-center justify-center bg-black text-white rounded;
     background: #343434;
+    background: url('/fms-lsk.png') no-repeat center center;
+    background-size: 100% 100%;
+  }
+}
+
+.fms-keys {
+  .lg {
+    button {
+      @apply text-sm h-10 leading-3;
+      padding-top: 10px;
+    }
+  }
+
+  button {
+    background: url('/fms-key.png') no-repeat center center;
+    background-size: 100% 100%;
+    color: #FFFDFA;
+    text-shadow: 0 0 5px orangered;
   }
 }
 </style>
