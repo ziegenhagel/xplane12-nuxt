@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const {readDataref, writeDataref} = useXPlane()
-// await writeDataref('sim/cockpit/radios/com1_freq_hz', 11922)
+const {readDataref, writeDataref, command} = useXPlane()
 
 const com1_freq_hz = ref(0)
 const com1_stdby_freq_hz = ref(0)
@@ -75,6 +74,11 @@ const selectAllOnFocus = (event: FocusEvent) => {
   const input = event.target as HTMLInputElement
   input.select()
 }
+
+// commands
+const cmd = async (cmd: string) => {
+  await command(cmd)
+}
 </script>
 
 <template>
@@ -130,6 +134,10 @@ const selectAllOnFocus = (event: FocusEvent) => {
       </section>
     </div>
   </div>
+
+  <button @click="cmd('sim/autopilot/heading_down')">
+    Heading down
+  </button>
 </template>
 <style>
 
@@ -160,6 +168,10 @@ const selectAllOnFocus = (event: FocusEvent) => {
   input {
     @apply text-white px-3
   }
+}
+
+button {
+  @apply bg-black text-white p-2 rounded-lg
 }
 
 code, input {

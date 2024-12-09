@@ -24,8 +24,20 @@ export const useXPlane = () => {
         }).then(response => response.json())
     }
 
+    const command = async (cmd) => {
+        return await fetch(NUXT_API_BASE+'/api/xplane/command', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({cmd})
+        }).then(response => response.json())
+    }
+
     return {
         readDataref,
-        writeDataref
+        writeDataref,
+        command
     }
 }
