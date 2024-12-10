@@ -3,9 +3,13 @@
     <div class="fms" style="width: 27em">
       <div class="fms-top">
 
-        <div class="fms-display">
+        <div class="fms-display relative">
           <div class="lsks">
             <button v-for="(line, index) in [1, 2, 3, 4, 5, 6]" class="lsk" @click="lsk(line,'l')">-</button>
+            <div class="written-line text-white bg-black font-bold  ml-16 font-mono text-lg"
+                 style="position:absolute;bottom:0;z-index:99999"
+                 v-if="writtenLineVisible"> {{ writtenLine }}
+            </div>
           </div>
           <div class="lines">
             <div v-for="(line, index) in displayLines" :key="index" class="fms-line">
@@ -24,12 +28,32 @@
         </div>
       </div>
 
-      <div class="fms-keys">
-        <div class="lg grid grid-cols-6">
+      <div class="fms-keys mb-3">
+        <div class="lg grid gap-1 mb-1 grid-cols-6">
           <button v-for="(key,cmd) in FMS_KEYS.controlKeys" @click="fmsclick(cmd)">{{ key }}</button>
         </div>
-      </div>
 
+        <div class="grid gap-1 grid-cols-6 items-start">
+          <div class="lg gap-1 grid grid-cols-2 col-span-2">
+            <button v-for="(key,cmd) in FMS_KEYS.navigationKeys" @click="fmsclick(cmd)">{{
+                key
+              }}
+            </button>
+            <!-- NUMERIC KEYS -->
+            <div class="grid grid-cols-3 col-span-2">
+              <button v-for="(key,cmd) in FMS_KEYS.numericKeys" class="rounded-full aspect-square text-lg"
+                      @click="fmsclick(cmd)">{{ key }}
+              </button>
+            </div>
+          </div>
+          <!-- ALPHABETIC KEYS -->
+          <div class="gap-1 grid grid-cols-5 col-span-4">
+            <button v-for="(key,cmd) in FMS_KEYS.alphabeticKeys" class="aspect-square "
+                    @click="fmsclick(cmd)">{{ key }}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
     <img width="400" src="/mcdu.jpeg" alt="MCDU"/>
   </div>
@@ -42,6 +66,9 @@ import {ref, computed} from 'vue'
 const {readDataref, command} = useXPlane()
 const rawTextLines = ref(Array(16).fill(''))
 const rawStyleLines = ref(Array(16).fill(''))
+
+const writtenLine = ref('')
+const writtenLineVisible = ref(false)
 
 // UTF-8 Decoder Funktion
 function utf8Decode(bytes) {
@@ -196,24 +223,13 @@ onUnmounted(() => {
 })
 
 const lsk = async (line, side) => {
+  writtenLine.value = ''
+
   await command(`sim/FMS/ls_${line}${side}`)
   await updateFmsData()
 }
 
 const FMS_KEYS = {
-  // Navigation-related keys
-  // navKeys: [
-  //   'index',
-  //   'foln',
-  //   'grz',
-  //   'des',
-  //   'dir intc',
-  //   'legs',
-  //   'delaarr',
-  //   'fix',
-  //   'navrad',
-  //   'airport'
-  // ],
 
   // Control and execution keys
   controlKeys: {
@@ -232,7 +248,11 @@ const FMS_KEYS = {
   },
   navigationKeys: {
     'airport ': 'AIR PORT',
-    '_2': ''
+    'key_delete': '(DEL)',
+    'key_prev': '←',
+    'key_up': '↑',
+    'key_next': '→',
+    'key_down': '↓',
   },
 
   // Performance and data keys
@@ -243,48 +263,55 @@ const FMS_KEYS = {
   ],
 
   // Numeric keys
-  numericKeys: [
-    'key_0',
-    'key_1',
-    'key_?',
-    'key_3',
-    'key_4',
-    'key_5',
-    'key_6',
-    'key_7',
-    'key_8',
-    'key_9'
-  ],
+  numericKeys: {
+    'key_1': '1',
+    'key_2': '2',
+    'key_3': '3',
+    'key_4': '4',
+    'key_5': '5',
+    'key_6': '6',
+    'key_7': '7',
+    'key_8': '8',
+    'key_9': '9',
+    'key_period': '.',
+    'key_0': '0',
+    'key_minus': '-/+',
+  },
 
   // Alphabetic keys
-  alphabeticKeys: [
-    'key_A',
-    'key_B',
-    'key_C',
-    'key_D',
-    'key_E',
-    'key_F',
-    'key_G',
-    'key_H',
-    'key_I',
-    'key_J',
-    'key_K',
-    'key_L',
-    'key_M',
-    'key_N',
-    'key_o',
-    'key_P',
-    'Key_Q',
-    'key_R',
-    'key_S',
-    'key_T',
-    'key_u',
-    'key_V',
-    'key_W',
-    'key_X',
-    'key_Y',
-    'key_Z'
-  ],
+  alphabeticKeys: {
+    'key_A': 'A',
+    'key_B': 'B',
+    'key_C': 'C',
+    'key_D': 'D',
+    'key_E': 'E',
+    'key_F': 'F',
+    'key_G': 'G',
+    'key_H': 'H',
+    'key_I': 'I',
+    'key_J': 'J',
+    'key_K': 'K',
+    'key_L': 'L',
+    'key_M': 'M',
+    'key_N': 'N',
+    'key_O': 'O',
+    'key_P': 'P',
+    'key_Q': 'Q',
+    'key_R': 'R',
+    'key_S': 'S',
+    'key_T': 'T',
+    'key_U': 'U',
+    'key_V': 'V',
+    'key_W': 'W',
+    'key_X': 'X',
+    'key_Y': 'Y',
+    'key_Z': 'Z',
+    'key_slash': '/',
+    'key_space': 'SP',
+    'key_overfly': '▵',
+    'key_clear': 'CLR',
+  },
+
 
   // Special characters and control keys
   specialKeys: [
@@ -300,7 +327,55 @@ const FMS_KEYS = {
 };
 
 
+let lastWrittenLine = null
+
 const fmsclick = async (key) => {
+
+  // wenn der key key_A .. key_Z, key_slash, key_space, key_overfly, key_clear, key_delete, key_period, key_minus, key_0 .. key_9 ist, dann
+  // schreibe den key in writtenLine bzw bearbeite writtenLine entsprechend
+
+  // regex für key_A .. key_Z, key_slash, key_space, key_overfly, key_clear, key_delete, key_period, key_minus, key_0 .. key_9
+  const regex = /key_(A|B|C|D|E|F|G|H|I|J|K|L|M|N|O|P|Q|R|S|T|U|V|W|X|Y|Z|slash|space|overfly|clear|delete|period|minus|0|1|2|3|4|5|6|7|8|9)/
+  if (regex.test(key)) {
+    // wenn key_clear, dann writtenLine = ''
+    if (key === 'key_clear') {
+      writtenLine.value = writtenLine.value.slice(0, -1)
+    }
+    // wenn key_delete, dann writtenLine = writtenLine.slice(0, -1)
+    else if (key === 'key_delete') {
+      writtenLine.value = ''
+    }
+    // wenn key_period, dann writtenLine += '.'
+    else if (key === 'key_period') {
+      writtenLine.value += '.'
+    }
+    // wenn key_minus, dann writtenLine += '-'
+    else if (key === 'key_minus') {
+      writtenLine.value += '-'
+    }
+    // wenn key_space, dann writtenLine += ' '
+    else if (key === 'key_space') {
+      writtenLine.value += ' '
+    } else if (key === 'key_slash') {
+      writtenLine.value += '/'
+    }
+    // wenn key_overfly, dann writtenLine += '▵'
+    else if (key === 'key_overfly') {
+      writtenLine.value += '▵'
+    }
+    // wenn key_A .. key_Z, dann writtenLine += key
+    else {
+      writtenLine.value += key.slice(4)
+    }
+
+    // hide written line nach 1 sekunde ohne änderung
+    lastWrittenLine = setTimeout(() => {
+      writtenLineVisible.value = false
+    }, 1000)
+    writtenLineVisible.value = true
+
+  }
+
   await command(`sim/FMS/${key}`)
   await updateFmsData()
 }
@@ -308,24 +383,24 @@ const fmsclick = async (key) => {
 
 <style scoped>
 .fms-display {
-  padding: 2.9rem .4rem 0;
+  padding: 2.4rem .4rem 0;
   font-family: monospace;
   font-size: 1.5em;
   @apply flex gap-4;
 
   .lines {
-    @apply bg-black border border-gray-500 border-2 border-b-gray-300 rounded-lg p-2;
+    @apply bg-black border-gray-500 rounded-lg p-2;
   }
 }
 
-.fms-top {
-  background: url('/fms-top.png') no-repeat top center;
+.fms {
+  background: url('/mcdu.jpg') no-repeat top center;
   background-size: 100%;
 }
 
 .fms-line {
   white-space: pre;
-  line-height: 1.02;
+  line-height: 0.88;
 }
 
 .fms-char {
@@ -336,8 +411,8 @@ const fmsclick = async (key) => {
 
 .lsks {
   @apply flex flex-col;
-  margin-top: 2.35em;
-  gap: .8em;
+  margin-top: 1.6em;
+  gap: .59em;
 
   .lsk {
     @apply px-4 h-6 flex items-center justify-center bg-black text-white rounded;
@@ -348,10 +423,12 @@ const fmsclick = async (key) => {
 }
 
 .fms-keys {
+  @apply px-12 mt-2;
+
   .lg {
     button {
-      @apply text-sm h-10 leading-3;
-      padding-top: 10px;
+      @apply text-xs h-9 leading-3;
+      padding-top: 6px;
     }
   }
 
@@ -359,6 +436,7 @@ const fmsclick = async (key) => {
     background: url('/fms-key.png') no-repeat center center;
     background-size: 100% 100%;
     color: #FFFDFA;
+    font-family: 'Arial';
     text-shadow: 0 0 5px orangered;
   }
 }
