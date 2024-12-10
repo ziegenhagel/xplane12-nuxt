@@ -55,7 +55,6 @@
         </div>
       </div>
     </div>
-    <img width="400" src="/mcdu.jpeg" alt="MCDU"/>
   </div>
   <button @click="updateFmsData">Update</button>
 </template>
@@ -140,7 +139,7 @@ const getCharacterStyle = (styleCode) => {
       styles.fontSize = '0.75em'
       break
     case 4:
-      styles.color = '#90EE90' // hellgrün
+      styles.color = '#0f0' // hellgrün
       break
     case 7:
       styles.color = '#FFFFFF' // weiß
@@ -161,6 +160,12 @@ const getCharacterStyle = (styleCode) => {
     case 3:
       styles.color = 'yellow' // gelb
       styles.fontSize = '0.75em'
+      break
+    case 132:
+      styles.color = '#0f0' // gelb
+      break
+    case 133:
+      styles.color = '#f0f'
       break
     case 6:
       styles.color = 'orange'
@@ -249,10 +254,10 @@ const FMS_KEYS = {
   navigationKeys: {
     'airport ': 'AIR PORT',
     'key_delete': '(DEL)',
-    'key_prev': '←',
-    'key_up': '↑',
-    'key_next': '→',
-    'key_down': '↓',
+    'prev': '←',
+    'up': '↑',
+    'next': '→',
+    'down': '↓',
   },
 
   // Performance and data keys
