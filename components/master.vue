@@ -14,7 +14,7 @@ const {readDataref, writeDataref, command} = useXPlane()
 const btns = ref([
   {label: 'Master Caut', command: 'sim/annunciator/clear_master_caution', color: 'orange', active: false},
   {label: 'Master Warn', command: 'sim/annunciator/clear_master_warning', color: 'red', active: false},
-  {label: 'Master Acc', command: 'sim/annunciator/clear_master_accept', color: 'gray', active: false},
+  // {label: 'Master Acc', command: 'sim/annunciator/clear_master_accept', color: 'gray', active: false},
 ])
 
 
@@ -22,16 +22,16 @@ const btns = ref([
 const reloadData = async () => {
   const {data: data1} = await readDataref('sim/cockpit/warnings/master_caution_on')
   const {data: data2} = await readDataref('sim/cockpit/warnings/master_warning_on')
-  const {data: data3} = await readDataref('sim/cockpit/warnings/master_accept_on')
+  // const {data: data3} = await readDataref('sim/cockpit/warnings/master_accept_on')
   btns.value[0].active = data1
   btns.value[1].active = data2
-  btns.value[2].active = data3
+  // btns.value[2].active = data3
 }
 
 // once every 3 seconds
 if (typeof window !== 'undefined') {
   reloadData()
-  setInterval(reloadData, 3000)
+  setInterval(reloadData, 10000)
 }
 
 const clearMaster = async (which: string) => {

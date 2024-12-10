@@ -56,7 +56,6 @@
       </div>
     </div>
   </div>
-  <button @click="updateFmsData">Update</button>
 </template>
 
 <script setup>
@@ -218,7 +217,7 @@ const updateFmsData = async () => {
 let updateInterval
 onMounted(() => {
   updateFmsData()
-  updateInterval = setInterval(updateFmsData, 60000)
+  updateInterval = setInterval(updateFmsData, 30000)
 })
 
 onUnmounted(() => {
