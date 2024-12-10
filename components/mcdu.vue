@@ -441,7 +441,6 @@ const fmsclick = async (key) => {
     background: url('/fms-key.png') no-repeat center center;
     background-size: 100% 100%;
     color: #FFFDFA;
-    font-family: 'Arial';
     text-shadow: 0 0 5px orangered;
   }
 }

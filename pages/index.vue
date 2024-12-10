@@ -4,6 +4,7 @@
       <fcu/>
       <rmp/>
       <tcas/>
+      <master/>
     </div>
     <mcdu/>
   </div>
@@ -13,6 +14,11 @@
 @font-face {
   font-family: "7seg";
   src: url("/fonts/7seg.ttf");
+}
+
+@font-face {
+  font-family: "roboto condensed";
+  src: url("/fonts/robotocond.ttf");
 }
 
 .fcu {
@@ -54,7 +60,9 @@ code, input {
 
 body {
   background: #6D87A1;
-  font-family: sans-serif;
+  font-family: "roboto condensed";
+  letter-spacing: -.06rem;
+  font-weight: 450;
 }
 
 .fcu {
