@@ -3,8 +3,6 @@ import {XPLANE_API_BASE} from '~/server/utils/constants'
 export default defineEventHandler(async (event) => {
     const {name, value} = await readBody(event)
 
-    console.log("writign BODY", name, value)
-
     // First get the dataref id
     const idResponse = await fetch(`${XPLANE_API_BASE}/datarefs?filter[name]=${encodeURIComponent(name)}`)
     const idData = await idResponse.json()

@@ -5,6 +5,9 @@
       <rmp/>
       <tcas/>
       <master/>
+      <lt-apu/>
+
+      <xp/>
     </div>
     <mcdu/>
   </div>
