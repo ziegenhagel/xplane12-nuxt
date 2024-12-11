@@ -1,12 +1,10 @@
 <template>
-  <div class="flex">
+  <div class="flex w-full">
     <div>
       <fcu/>
       <rmp/>
       <tcas/>
       <master/>
-      <lt-apu/>
-
       <xp/>
     </div>
     <mcdu/>
