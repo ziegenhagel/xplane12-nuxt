@@ -1,21 +1,57 @@
+// xplaneConnection.js
 import * as dgram from "node:dgram";
-import {IP} from "~/server/utils/env";
+import { IP } from "~/server/utils/env";
 
 class XPlaneUDP {
+    static instance = null;
+
     constructor(xplaneIP = IP, xplanePort = 49000) {
+        if (XPlaneUDP.instance) {
+            return XPlaneUDP.instance;
+        }
+
         this.socket = dgram.createSocket('udp4');
         this.xplaneAddr = xplaneIP;
         this.xplanePort = xplanePort;
+        this.isConnected = false;
+
+        // Verbindung bei Inaktivität nicht automatisch schließen
+        this.socket.unref();
+
+        // Error handling
+        this.socket.on('error', (error) => {
+            console.error('UDP Socket Error:', error);
+            this.reconnect();
+        });
+
+        XPlaneUDP.instance = this;
     }
 
-    /**
-     * Sendet einen X-Plane Command
-     * @param {string} command - X-Plane Command (z.B. "sim/autopilot/heading_up")
-     * @returns {Promise} Promise der aufgelöst wird, wenn der Command gesendet wurde
-     */
+    connect() {
+        if (!this.isConnected) {
+            this.socket = dgram.createSocket('udp4');
+            this.socket.unref();
+            this.isConnected = true;
+        }
+    }
+
+    reconnect() {
+        if (this.isConnected) {
+            try {
+                this.socket.close();
+            } catch (error) {
+                console.error('Error closing socket:', error);
+            }
+        }
+        this.connect();
+    }
+
     sendCommand(command) {
         return new Promise((resolve, reject) => {
-            // CMND Format: "CMND\0" + command + "\0"
+            if (!this.isConnected) {
+                this.connect();
+            }
+
             const buffer = Buffer.alloc(6 + command.length);
             buffer.write('CMND\0', 0);
             buffer.write(command, 5);
@@ -31,26 +67,15 @@ class XPlaneUDP {
         });
     }
 
-    /**
-     * Setzt einen X-Plane DataRef Wert
-     * @param {string} dref - Name des DataRef
-     * @param {number} value - Zu setzender Wert
-     * @returns {Promise} Promise der aufgelöst wird, wenn der DataRef gesendet wurde
-     */
     sendDref(dref, value) {
         return new Promise((resolve, reject) => {
-            // DREF Format laut Dokumentation:
-            // struct dref_struct { xflt var; xchr dref_path[strDIM]; }
-            // strDIM ist 500
-            const buffer = Buffer.alloc(509); // 5 (DREF\0) + 4 (float) + 500 (path)
+            if (!this.isConnected) {
+                this.connect();
+            }
 
-            // Header
+            const buffer = Buffer.alloc(509);
             buffer.write('DREF\0', 0);
-
-            // Float-Wert (4 bytes)
             buffer.writeFloatLE(value, 5);
-
-            // DREF Path (500 bytes, null-terminated)
             buffer.write(dref, 9);
 
             this.socket.send(buffer, this.xplanePort, this.xplaneAddr, (error) => {
@@ -63,21 +88,15 @@ class XPlaneUDP {
         });
     }
 
-    /**
-     * Sendet Daten an X-Plane
-     * @param {number} index - Index des Datenpunkts
-     * @param {number[]} values - Array von bis zu 8 Werten
-     * @returns {Promise} Promise der aufgelöst wird, wenn die Daten gesendet wurden
-     */
     sendData(index, values) {
         return new Promise((resolve, reject) => {
-            // DATA Format:
-            // struct data_struct { int index; float data[8]; }
-            const buffer = Buffer.alloc(36); // 4 (index) + 8 * 4 (floats)
+            if (!this.isConnected) {
+                this.connect();
+            }
 
+            const buffer = Buffer.alloc(36);
             buffer.writeInt32LE(index, 0);
 
-            // Fülle die Float-Werte
             for (let i = 0; i < Math.min(values.length, 8); i++) {
                 buffer.writeFloatLE(values[i], 4 + (i * 4));
             }
@@ -92,38 +111,25 @@ class XPlaneUDP {
         });
     }
 
-    /**
-     * Schließt die UDP-Verbindung
-     */
     close() {
-        this.socket.close();
+        if (this.isConnected) {
+            this.socket.close();
+            this.isConnected = false;
+            XPlaneUDP.instance = null;
+        }
     }
 }
 
-
+// handler.js
 export default defineEventHandler(async (event) => {
-    const {cmd} = await readBody(event)
-
-
-    console.log('Starte X-Plane-Verbindung...');
-
-    const xp = new XPlaneUDP();
+    const { cmd } = await readBody(event);
 
     try {
-        // Beispiel-Commands
-        // await xp.sendCommand('sim/autopilot/heading_up');  // Heading erhöhen
-        await xp.sendCommand(cmd);   // Gas erhöhen
-        // await xp.sendCommand('sim/systems/wipers_up');   // Gas erhöhen
-
-        // Beispiel-DataRef
-        await xp.sendDref('sim/cockpit/switches/gear_handle_status', 1);  // Fahrwerk ausfahren
+        const xp = new XPlaneUDP(); // Wird automatisch die bestehende Instanz zurückgeben
+        await xp.sendCommand(cmd);
+        return { status: 'success' };
     } catch (error) {
         console.error('Fehler:', error);
-    } finally {
-        console.log('Schließe X-Plane-Verbindung...');
-        xp.close();
+        return { status: 'error', message: error.message };
     }
-
-
-    return {status: 'success'}
-})
+});
