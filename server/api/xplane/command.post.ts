@@ -1,5 +1,5 @@
 import * as dgram from "node:dgram";
-import {IP} from "~/server/utils/constants";
+import {IP} from "~/server/utils/env";
 
 class XPlaneUDP {
     constructor(xplaneIP = IP, xplanePort = 49000) {
